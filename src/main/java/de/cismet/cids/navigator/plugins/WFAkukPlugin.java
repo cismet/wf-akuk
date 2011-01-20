@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 // Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3)
@@ -8,78 +15,43 @@ import Sirius.navigator.plugin.context.PluginContext;
 import Sirius.navigator.plugin.interfaces.*;
 import Sirius.navigator.types.treenode.DefaultMetaTreeNode;
 import Sirius.navigator.types.treenode.ObjectTreeNode;
+
 import Sirius.server.middleware.types.MetaObject;
-import java.io.*;
-import java.util.*;
+
 import org.apache.log4j.Logger;
 
-public class WFAkukPlugin
-        implements PluginSupport {
+import java.io.*;
 
-    private class ShowInAkuk
-            implements PluginMethod {
+import java.util.*;
 
-        public void invoke()
-                throws Exception {
-            log.fatal("Show in AKUK");
-            Collection selectedNodes = pluginContext.getMetadata().getSelectedNodes();
-            Iterator it = selectedNodes.iterator();
-            Vector mos = new Vector();
-            try {
-                while (it.hasNext()) {
-                    log.debug("selected node");
-                    DefaultMetaTreeNode node = (DefaultMetaTreeNode) it.next();
-                    if (node instanceof ObjectTreeNode) {
-                        MetaObject mo = ((ObjectTreeNode) node).getMetaObject();
-                        if (mo.getClassKey().equalsIgnoreCase(akukClassKey)) {
-                            log.debug("Metaobject hinzugefuegt");
-                            mos.add(mo);
-                        } else {
-                            log.debug((new StringBuilder()).append("falscher ClassKey:").append(mo.getClassKey()).append("=?=").append(akukClassKey).toString());
-                        }
-                    } else {
-                        log.warn((new StringBuilder()).append("Node ist kein ObjectTreeNode, sondern:").append(node.getClass()).toString());
-                    }
-                }
-                if (mos.size() > 0) {
-                    String outString = "";
-                    for (Iterator i$ = mos.iterator(); i$.hasNext();) {
-                        MetaObject mo = (MetaObject) i$.next();
-                        outString = (new StringBuilder()).append(outString).append(mo.getID()).append("\r\n").toString();
-                    }
+/**
+ * DOCUMENT ME!
+ *
+ * @version  $Revision$, $Date$
+ */
+public class WFAkukPlugin implements PluginSupport {
 
-                    log.debug((new StringBuilder()).append("outstring").append(outString).toString());
-                    try {
-                        (new File((new StringBuilder()).append(home).append(fs).append(exchangeDirectory).toString())).mkdirs();
-                        BufferedWriter out = new BufferedWriter(new FileWriter((new StringBuilder()).append(home).append(fs).append(exchangeDirectory).append(fs).append(exchangeFile).toString()));
-                        out.write(outString);
-                        out.close();
-                    } catch (IOException e) {
-                        log.error("Fehler beim Schreiben des WF-AKUK Exchange Files", e);
-                    }
-                    try {
-                        Runtime rt = Runtime.getRuntime();
-                        rt.exec((new StringBuilder()).append(home).append(fs).append(exchangeDirectory).append(fs).append(triggerExe).toString());
-                    } catch (Throwable t) {
-                        log.error("Fehler beim Aufruf der WF-AKUK triggerExe", t);
-                    }
-                }
-            } catch (Throwable t) {
-                log.fatal("Unerwarteter Fehler im WF-AKUK-Plugin", t);
-            }
-        }
+    //~ Instance fields --------------------------------------------------------
 
-        public String getId() {
-            return getClass().getName();
-        }
-        
+    private final Logger log = Logger.getLogger(getClass());
+    private HashMap pluginMethods;
+    private ShowInAkuk showInAkukMethod;
+    private PluginContext pluginContext;
+    private String akukClassKey;
+    private String exchangeFile;
+    private String exchangeDirectory;
+    private String triggerExe;
+    private String home;
+    private String fs;
 
-        private ShowInAkuk() {
-           super();
-        }
-    }
+    //~ Constructors -----------------------------------------------------------
 
-    public WFAkukPlugin(PluginContext pluginContext) {
+    /**
+     * Creates a new WFAkukPlugin object.
+     *
+     * @param  pluginContext  DOCUMENT ME!
+     */
+    public WFAkukPlugin(final PluginContext pluginContext) {
         pluginMethods = new HashMap();
         showInAkukMethod = new ShowInAkuk();
         home = "";
@@ -94,44 +66,138 @@ public class WFAkukPlugin
         fs = System.getProperty("file.separator");
     }
 
-    public PluginUI getUI(String id) {
+    //~ Methods ----------------------------------------------------------------
+
+    @Override
+    public PluginUI getUI(final String id) {
         return null;
     }
 
-    public PluginMethod getMethod(String id) {
-        return (PluginMethod) pluginMethods.get(id);
+    @Override
+    public PluginMethod getMethod(final String id) {
+        return (PluginMethod)pluginMethods.get(id);
     }
 
-    public void setVisible(boolean flag) {
+    @Override
+    public void setVisible(final boolean flag) {
     }
 
-    public void setActive(boolean flag) {
+    @Override
+    public void setActive(final boolean flag) {
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public String getId() {
         return "wfakukplugin";
     }
 
+    @Override
     public Iterator getUIs() {
-        LinkedList ll = new LinkedList();
+        final LinkedList ll = new LinkedList();
         return ll.iterator();
     }
 
+    @Override
     public PluginProperties getProperties() {
         return null;
     }
 
+    @Override
     public Iterator getMethods() {
         return pluginMethods.values().iterator();
     }
-    private final Logger log = Logger.getLogger(getClass());
-    private HashMap pluginMethods;
-    private ShowInAkuk showInAkukMethod;
-    private PluginContext pluginContext;
-    private String akukClassKey;
-    private String exchangeFile;
-    private String exchangeDirectory;
-    private String triggerExe;
-    private String home;
-    private String fs;
+
+    //~ Inner Classes ----------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private class ShowInAkuk implements PluginMethod {
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new ShowInAkuk object.
+         */
+        private ShowInAkuk() {
+            super();
+        }
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public void invoke() throws Exception {
+            log.fatal("Show in AKUK");
+            final Collection selectedNodes = pluginContext.getMetadata().getSelectedNodes();
+            final Iterator it = selectedNodes.iterator();
+            final Vector mos = new Vector();
+            try {
+                while (it.hasNext()) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("selected node");
+                    }
+                    final DefaultMetaTreeNode node = (DefaultMetaTreeNode)it.next();
+                    if (node instanceof ObjectTreeNode) {
+                        final MetaObject mo = ((ObjectTreeNode)node).getMetaObject();
+                        if (mo.getClassKey().equalsIgnoreCase(akukClassKey)) {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Metaobject hinzugefuegt");
+                            }
+                            mos.add(mo);
+                        } else {
+                            if (log.isDebugEnabled()) {
+                                log.debug((new StringBuilder()).append("falscher ClassKey:").append(mo.getClassKey())
+                                            .append("=?=").append(akukClassKey).toString());
+                            }
+                        }
+                    } else {
+                        log.warn((new StringBuilder()).append("Node ist kein ObjectTreeNode, sondern:").append(
+                                node.getClass()).toString());
+                    }
+                }
+                if (mos.size() > 0) {
+                    String outString = "";
+                    for (final Iterator i$ = mos.iterator(); i$.hasNext();) {
+                        final MetaObject mo = (MetaObject)i$.next();
+                        outString = (new StringBuilder()).append(outString).append(mo.getID()).append("\r\n")
+                                    .toString();
+                    }
+                    if (log.isDebugEnabled()) {
+                        log.debug((new StringBuilder()).append("outstring").append(outString).toString());
+                    }
+                    try {
+                        (new File((new StringBuilder()).append(home).append(fs).append(exchangeDirectory).toString()))
+                                .mkdirs();
+                        final BufferedWriter out = new BufferedWriter(new FileWriter(
+                                    (new StringBuilder()).append(home).append(fs).append(exchangeDirectory).append(
+                                        fs).append(exchangeFile).toString()));
+                        out.write(outString);
+                        out.close();
+                    } catch (IOException e) {
+                        log.error("Fehler beim Schreiben des WF-AKUK Exchange Files", e);
+                    }
+                    try {
+                        final Runtime rt = Runtime.getRuntime();
+                        rt.exec((new StringBuilder()).append(home).append(fs).append(exchangeDirectory).append(fs)
+                                    .append(triggerExe).toString());
+                    } catch (Throwable t) {
+                        log.error("Fehler beim Aufruf der WF-AKUK triggerExe", t);
+                    }
+                }
+            } catch (Throwable t) {
+                log.fatal("Unerwarteter Fehler im WF-AKUK-Plugin", t);
+            }
+        }
+
+        @Override
+        public String getId() {
+            return getClass().getName();
+        }
+    }
 }
