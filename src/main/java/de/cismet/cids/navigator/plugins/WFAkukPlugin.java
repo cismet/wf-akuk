@@ -136,7 +136,7 @@ public class WFAkukPlugin implements PluginSupport {
             log.fatal("Show in AKUK");
             final Collection selectedNodes = pluginContext.getMetadata().getSelectedNodes();
             final Iterator it = selectedNodes.iterator();
-            final Vector mos = new Vector();
+            final ArrayList mos = new ArrayList();
             try {
                 while (it.hasNext()) {
                     if (log.isDebugEnabled()) {
@@ -183,9 +183,10 @@ public class WFAkukPlugin implements PluginSupport {
                         log.error("Fehler beim Schreiben des WF-AKUK Exchange Files", e);
                     }
                     try {
-                        final Runtime rt = Runtime.getRuntime();
-                        rt.exec((new StringBuilder()).append(home).append(fs).append(exchangeDirectory).append(fs)
-                                    .append(triggerExe).toString());
+                        final ProcessBuilder pb = new ProcessBuilder(triggerExe);
+                        pb.directory(new File(
+                                new StringBuilder().append(home).append(fs).append(exchangeDirectory).toString()));
+                        pb.start();
                     } catch (Throwable t) {
                         log.error("Fehler beim Aufruf der WF-AKUK triggerExe", t);
                     }
