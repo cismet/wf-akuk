@@ -41,7 +41,6 @@ public class WFAkukPlugin implements PluginSupport {
     private String exchangeFile;
     private String exchangeDirectory;
     private String triggerExe;
-    private String home;
     private String fs;
 
     //~ Constructors -----------------------------------------------------------
@@ -54,7 +53,6 @@ public class WFAkukPlugin implements PluginSupport {
     public WFAkukPlugin(final PluginContext pluginContext) {
         pluginMethods = new HashMap();
         showInAkukMethod = new ShowInAkuk();
-        home = "";
         fs = "";
         pluginMethods.put(showInAkukMethod.getId(), showInAkukMethod);
         this.pluginContext = pluginContext;
@@ -62,7 +60,6 @@ public class WFAkukPlugin implements PluginSupport {
         exchangeFile = pluginContext.getEnvironment().getParameter("exchangeFile");
         exchangeDirectory = pluginContext.getEnvironment().getParameter("exchangeDirectory");
         triggerExe = pluginContext.getEnvironment().getParameter("exchangeTriggerExe");
-        home = System.getProperty("user.home");
         fs = System.getProperty("file.separator");
     }
 
@@ -136,7 +133,7 @@ public class WFAkukPlugin implements PluginSupport {
             log.fatal("Show in AKUK");
             final Collection selectedNodes = pluginContext.getMetadata().getSelectedNodes();
             final Iterator it = selectedNodes.iterator();
-            final Vector mos = new Vector();
+            final ArrayList mos = new ArrayList();
             try {
                 while (it.hasNext()) {
                     if (log.isDebugEnabled()) {
@@ -172,20 +169,33 @@ public class WFAkukPlugin implements PluginSupport {
                         log.debug((new StringBuilder()).append("outstring").append(outString).toString());
                     }
                     try {
-                        (new File((new StringBuilder()).append(home).append(fs).append(exchangeDirectory).toString()))
-                                .mkdirs();
-                        final BufferedWriter out = new BufferedWriter(new FileWriter(
-                                    (new StringBuilder()).append(home).append(fs).append(exchangeDirectory).append(
-                                        fs).append(exchangeFile).toString()));
+                        final String dir = new StringBuilder().append(exchangeDirectory).toString();
+                        if (log.isDebugEnabled()) {
+                            log.debug("Anlegen von:" + dir);
+                        }
+                        final File dirFile = new File(dir);
+                        dirFile.mkdirs();
+                        if (log.isDebugEnabled()) {
+                            log.debug("existiert=" + dirFile.exists());
+                        }
+                        final String outS = new StringBuilder().append(exchangeDirectory)
+                                    .append(fs)
+                                    .append(exchangeFile)
+                                    .toString();
+                        final File outFile = new File(outS);
+                        if (log.isDebugEnabled()) {
+                            log.debug("existiert " + outS + " schon? =" + outFile.exists());
+                        }
+                        final BufferedWriter out = new BufferedWriter(new FileWriter(outFile));
                         out.write(outString);
                         out.close();
-                    } catch (IOException e) {
+                    } catch (Throwable e) {
                         log.error("Fehler beim Schreiben des WF-AKUK Exchange Files", e);
                     }
                     try {
-                        final Runtime rt = Runtime.getRuntime();
-                        rt.exec((new StringBuilder()).append(home).append(fs).append(exchangeDirectory).append(fs)
-                                    .append(triggerExe).toString());
+                        final ProcessBuilder pb = new ProcessBuilder(triggerExe);
+                        pb.directory(new File(new StringBuilder().append(exchangeDirectory).toString()));
+                        pb.start();
                     } catch (Throwable t) {
                         log.error("Fehler beim Aufruf der WF-AKUK triggerExe", t);
                     }
