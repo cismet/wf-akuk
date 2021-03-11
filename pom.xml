@@ -11,7 +11,7 @@
     <groupId>de.cismet.cids.navigator.plugin</groupId>
     <artifactId>wf-akuk</artifactId>
     <packaging>jar</packaging>
-    <version>7.0</version>
+    <version>7.1-SNAPSHOT</version>
 
     <name>WFAkuk Plugin</name>
     <description>!!! description pending !!!</description>
@@ -20,7 +20,7 @@
         <connection>https://github.com/cismet/wf-akuk.git</connection>
         <developerConnection>scm:git:git@github.com:cismet/wf-akuk.git</developerConnection>
         <url>https://github.com/cismet/wf-akuk</url>
-        <tag>v7.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <issueManagement>
