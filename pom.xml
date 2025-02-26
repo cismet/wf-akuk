@@ -11,7 +11,7 @@
     <groupId>de.cismet.cids.navigator.plugin</groupId>
     <artifactId>wf-akuk</artifactId>
     <packaging>jar</packaging>
-    <version>8.1-SNAPSHOT</version>
+    <version>9.1-SNAPSHOT</version>
 
     <name>WFAkuk Plugin</name>
     <description>!!! description pending !!!</description>
